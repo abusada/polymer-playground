@@ -1,0 +1,38 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<dom-module id="ys-filters">
+  <tempalte>
+    <content></content>
+  </tempalte>
+  <script>
+    (function() {
+      'use strict';
+      Polymer({
+        is: 'ys-filters',
+        properties: {
+          list : {
+            type : Array
+          }
+        },
+        listeners: {
+          'stars-changed': '_onStarsChange',
+          'price-changed' : '_onPriceChange'
+        },
+        _onStarsChange: function(newVal){
+          if(!this.list) return false;
+          this.list = this.list.filter(function(item){
+            return this.stars.contains(item.stars);
+          }.bind(this));
+        },
+        _onPaymentChange: function(newVal){
+
+        },
+        _onAmenitiesChange: function(newVal){
+
+        },
+        _onPriceChange: function(newVal){
+
+        }
+      });
+    })();
+  </script>
+</dom-module>

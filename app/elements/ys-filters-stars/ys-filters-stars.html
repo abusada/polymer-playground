@@ -1,0 +1,62 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<dom-module id="ys-filters-stars">
+    <template>
+        <style>
+        :host {
+            display: block;
+        }
+        </style>
+
+        <paper-checkbox on-change="_onSelection" value="5" style="width:100%;"> 5 Stars </paper-checkbox>
+        <paper-checkbox on-change="_onSelection" value="4" style="width:100%;"> 4 Stars </paper-checkbox>
+        <paper-checkbox on-change="_onSelection" value="3" style="width:100%;"> 3 Stars </paper-checkbox>
+        <paper-checkbox on-change="_onSelection" value="2" style="width:100%;"> 2 Stars </paper-checkbox>
+        <paper-checkbox on-change="_onSelection" value="1" style="width:100%;"> 1 Star </paper-checkbox>
+
+    </template>
+    <script>
+    (function() {
+        'use strict';
+
+        Polymer({
+            is: 'ys-filters-stars',
+            properties: {
+                isOn : {
+                  type : Boolean,
+                  value : false
+                },
+                stars: {
+                    type: Array,
+                    notify: true,
+                    value: []
+                }
+            },
+            exec: function(item) {
+                return this.stars.contains(item.stars);
+            },
+            _onSelection: function(e) {
+                if (e.target.checked) {
+                    this.push('stars', e.target.value);
+                    this.isOn = true;
+                } else {
+                    var index = this.stars.indexOf(e.target.value);
+                    this.splice('stars', index, 1);
+                    if(this.stars.length == 0){
+                      this.isOn = false;
+                    }
+                }
+                this.fire('ys-filters', this);
+            }
+        });
+    })();
+    </script>
+</dom-module>

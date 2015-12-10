@@ -1,0 +1,109 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="ys-typeahead">
+    <template>
+        <style>
+        :host {
+            display: block;
+        }
+        </style>
+        <paper-input
+          id="searchInput"
+          type="search"
+          autocomplete="off"
+          autofocus="true"
+          label="Search!",
+          placeholder="Where do you want to go?"
+          value="{{query::input}}">
+        </paper-input>
+        <iron-ajax
+          id='ajax'
+          auto
+          url="https://services-staging.yamsafer.me/index.php"
+          params='{{ queryParams }}'
+          handle-as="json"
+          last-response="{{ results }}" ,
+        debounce-duration="300">
+        </iron-ajax>
+        <paper-menu id="reslutsList" selected="{{ selectedIndex }}">
+            <template is="dom-if" if="{{isFetching}}">
+                <div class="layout horizontal">
+                    <paper-spinner style="margin:25px auto;" active="true"></paper-spinner>
+                </div>
+            </template>
+            <template is="dom-repeat" items="{{results}}">
+                <paper-item>
+                    <paper-item-body>
+                        <span>{{item.text}}</span>  - <small>{{ item.payload.type }}</small>
+                    </paper-item-body>
+                </paper-item>
+            </template>
+        </paper-menu>
+    </template>
+    <script>
+    (function() {
+        'use strict';
+        Polymer({
+            is: 'ys-typeahead',
+            properties: {
+                results : {
+                  type : Object
+                },
+                query: {
+                    type: String,
+                    value: '',
+                    notify: true
+                },
+                queryParams: {
+                    type: String,
+                    computed: 'buildSearchRequest(query)'
+                },
+                isFetching: {
+                    type: Boolean
+                },
+                destination : {
+                  type : Object,
+                  notify : true
+                },
+                selectedIndex: {
+                    type: Object,
+                    observer: '_onSelectedIndexChanged'
+                },
+                selection : {
+                  type : Object,
+                  notify : true
+                }
+            },
+            buildSearchRequest: function(query) {
+                return { q: query }
+            },
+            _onSelectedIndexChanged: function(newIndex) {
+                var selection = this.results[newIndex - 1];
+                this.selection = selection;
+                this.results = [];
+                this.$.searchInput.value = selection.text;
+                this.fire('select', selection);
+            },
+            ready: function() {
+                var that = this;
+                this.$.ajax.addEventListener('request', function() {
+                    that.isFetching = true
+                })
+                this.$.ajax.addEventListener('response', function() {
+                    that.isFetching = false;
+                })
+            }
+        });
+    })();
+    </script>
+</dom-module>

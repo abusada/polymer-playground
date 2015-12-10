@@ -1,0 +1,106 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<script src="/bower_components/moment/moment.js"></script>
+<dom-module id="ys-calendar">
+    <template>
+        <style>
+        :host {
+            display: block;
+            text-align: center;
+        }
+
+        .header{
+          @apply(--layout-horizontal);
+          justify-content: center;
+        }
+
+        .month-label{
+           @apply(--layout-flex);
+           margin: 10px;
+        }
+
+        paper-item{
+            justify-content: center;
+        }
+
+
+        </style>
+        <div class="header">
+          <paper-icon-button icon="chevron-left"></paper-icon-button>
+          <h3 class="month-label"> {{ month.label }} </h3>
+          <paper-icon-button icon="chevron-right"></paper-icon-button>
+        </div>
+        <hr>
+        <paper-menu multi>
+            <template is="dom-repeat" items="{{ days }}" as="day">
+                <template is="dom-if" if="[[ day.label ]]">
+                  <paper-item>{{ day.label }}</paper-item>
+                </template>
+            </template>
+        </paper-menu>
+    </template>
+    <script>
+    (function() {
+        'use strict';
+
+        Polymer({
+            is: 'ys-calendar',
+
+            properties: {
+                // Current year
+                year : {
+                  type : Object,
+                  notify : true
+                },
+                // Current month
+                month: {
+                    type: Object,
+                    notify: true
+                },
+                // Current days of month in year
+                days: {
+                    type: Object,
+                    notify: true
+                }
+            },
+            ready: function() {
+                var month = moment().month();
+                var year = moment().year();
+                var days = daysOfMonth(year, month);
+                this.set('month', { label : moment().format("MMMM") })
+                this.set('days', days);
+            },
+            next : function(){
+              this.month.add("1", "month");
+            },
+            prev : function(){
+              this.month.subtract("1", "month");
+            }
+
+
+        });
+
+        function daysOfMonth(year, month) {
+            var result = [];
+            var date = moment().year(year).month(month).startOf('month');
+            for (var i = 1; i <= date.daysInMonth(); i++) {
+                result[i] = {
+                    label : date.format("dddd, Do"),
+                    asObject: date.toObject()
+                };
+                date = date.add("1", "day");
+            };
+            return result;
+        }
+
+    })();
+    </script>
+</dom-module>
